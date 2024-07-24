@@ -7,6 +7,11 @@ import numpy as np
 
 import librosa
 
+import pydirectinput
+
+import win32con
+import win32api
+
 import ctypes
 from ctypes import wintypes
 
@@ -61,12 +66,17 @@ class INPUT(ctypes.Structure):
 
 
 class SoftKbMouse:
-    PRESS_TIME = 0.1  # s
+    PRESS_TIME = 0.1
 
+    def __init__(self):
+        pass
+
+
+class SoftKbMouseV3(SoftKbMouse):
     # 系统层实现: https://stackoverflow.com/questions/54624221/simulate-physical-keypress-in-python-without-raising
     # -lowlevelkeyhookinjected-0/54638435#54638435
     def __init__(self):
-        pass
+        super().__init__()
 
     def PressKey(self, hexKeyCode):
         x = INPUT(type=INPUT_KEYBOARD,
@@ -83,6 +93,28 @@ class SoftKbMouse:
         self.PressKey(0x20)
         time.sleep((random.random() + 1.0) * self.PRESS_TIME)  # human-like
         self.ReleaseKey(0x20)
+
+
+class SoftKbMouseV2(SoftKbMouse):
+    def __init__(self):
+        super().__init__()
+        self.press = pydirectinput.press
+
+    def push_space(self):
+        self.press('space', interval=(random.random() + 1.0) * self.PRESS_TIME)
+
+
+class SoftKbMouseV1(SoftKbMouse):
+    def __init__(self):
+        super().__init__()
+        self.button = win32api.keybd_event
+        self.space_key = win32con.VK_SPACE
+        self.relax = win32con.KEYEVENTF_KEYUP
+
+    def push_space(self):
+        self.button(self.space_key, 0, 0, 0)
+        time.sleep((random.random() + 1.0) * self.PRESS_TIME)  # human-like
+        self.button(self.space_key, 0, self.relax, 0)
 
 
 class HardKbMouse:
