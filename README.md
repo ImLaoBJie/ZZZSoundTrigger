@@ -4,7 +4,9 @@ Dodging Trigger for ZZZ based on waveframehttps://github.com/ImLaoBJie/ZZZSoundT
 ## 使用
 
 下载：`git clone https://github.com/ImLaoBJie/ZZZSoundTrigger.git`
+
 环境安装：`pip install -r requirements.txt`
+
 运行, 管理员身份运行shell/cmd：`python Main.py`
 
 ## 参数说明
