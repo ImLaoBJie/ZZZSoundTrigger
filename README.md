@@ -1,5 +1,5 @@
 # ZZZSoundTrigger
-Dodging Trigger for ZZZ based on waveframehttps://github.com/ImLaoBJie/ZZZSoundTrigger
+Dodging Trigger for ZZZ based on waveframe
 
 ## 使用
 
