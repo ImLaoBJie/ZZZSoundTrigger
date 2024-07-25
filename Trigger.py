@@ -173,17 +173,17 @@ class HardKbMouse:
 
 
 class DodgingTrigger(GameAudioListener):
-    threshold = 0.10
     monitor_time = 5  # 秒
 
-    def __init__(self, sample_path: str, simulator, is_monitor=False):
-        self.simulator = simulator
+    def __init__(self, sample_path: str, action, threshold=0.1, ratio=1.0, is_monitor=False):
+        self.action = action
+        self.threshold = threshold
         self.is_monitor = is_monitor
         if self.is_monitor:
             self.len_samples = int(self.monitor_time / self.sample_len)
             self.monitor = WaveMonitor(self.len_samples, self.threshold)
             self.monitor_array = np.zeros(shape=(self.len_samples,), dtype=np.float64)
-        super().__init__(sample_path)
+        super().__init__(sample_path, ratio)
 
     def online_listening(self):
         print("开始监测")
@@ -210,7 +210,7 @@ class DodgingTrigger(GameAudioListener):
 
                 if max_score >= self.threshold:
                     # if not is_past_triggered:  # 应该可以连续激发
-                    self.simulator.push_space()  # 触发动作
+                    self.action()  # 触发动作
                     trigger_text = "触发分数: {}".format(round(max_score, 5))
                     self.monitor.update_message(trigger_text)
                     print(trigger_text)

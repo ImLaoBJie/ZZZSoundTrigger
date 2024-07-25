@@ -18,13 +18,15 @@ class GameAudioListener:
     device_index = 0  # 设备编号
     sample_len = 0.2  # 每次采样长度0.2s
 
-    def __init__(self, sample_path: str):
+    def __init__(self, sample_path: str, ratio=1.0):
         self.sample_waveform, sample_rate = librosa.load(sample_path)
         self.sample_waveform = librosa.resample(self.sample_waveform, orig_sr=sample_rate, target_sr=self.used_sr)
 
         # 初始化流监听器
         loopback_speaker = sc.get_microphone(id=str(sc.default_speaker().name), include_loopback=True)
         self.audio_instance = loopback_speaker.recorder(samplerate=self.used_sr, channels=self.used_channel)
+
+        self.ratio = ratio
 
         print("初始化完毕...")
 
@@ -41,7 +43,7 @@ class GameAudioListener:
             correlation = correlate(norm_sample_waveform, norm_stream_waveform, mode='same', method='fft') / \
                           norm_sample_waveform.shape[0]
 
-        max_corr = np.max(correlation)
+        max_corr = np.max(correlation) * self.ratio
 
         return max_corr
 
