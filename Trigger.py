@@ -19,9 +19,15 @@ from Listener import GameAudioListener
 from Monitor import WaveMonitor
 
 user32 = ctypes.WinDLL('user32', use_last_error=True)
+INPUT_MOUSE = 0
 INPUT_KEYBOARD = 1
+INPUT_HARDWARE = 2
 KEYEVENTF_KEYUP = 0x0002
 KEYEVENTF_UNICODE = 0x0004
+MOUSEEVENTF_LEFTDOWN = 0x0002
+MOUSEEVENTF_LEFTUP = 0x0004
+MOUSEEVENTF_RIGHTDOWN = 0x0008
+MOUSEEVENTF_RIGHTUP = 0x0010
 MAPVK_VK_TO_VSC = 0
 
 
@@ -67,6 +73,7 @@ class INPUT(ctypes.Structure):
 
 class SoftKbMouse:
     PRESS_TIME = 0.1
+    SHORT_PRESS_TIME = 0.01
 
     def __init__(self):
         pass
@@ -89,9 +96,23 @@ class SoftKbMouseV3(SoftKbMouse):
                                 dwFlags=KEYEVENTF_KEYUP))
         user32.SendInput(1, ctypes.byref(x), ctypes.sizeof(x))
 
+    def Mouse(self, dx, dy, flags):
+        x = INPUT(type=INPUT_MOUSE, mi=MOUSEINPUT(dx, dy, 0, flags, 0, 0))
+        user32.SendInput(1, ctypes.byref(x), ctypes.sizeof(INPUT))
+
     def push_space(self):
         self.PressKey(0x20)
         time.sleep((random.random() + 1.0) * self.PRESS_TIME)  # human-like
+        self.ReleaseKey(0x20)
+
+    def double_dodge(self):
+        self.Mouse(0, 0, MOUSEEVENTF_RIGHTDOWN)
+        self.Mouse(0, 0, MOUSEEVENTF_RIGHTUP)
+        time.sleep(self.SHORT_PRESS_TIME)
+        self.Mouse(0, 0, MOUSEEVENTF_LEFTDOWN)
+        self.Mouse(0, 0, MOUSEEVENTF_LEFTUP)
+        time.sleep(self.SHORT_PRESS_TIME)
+        self.PressKey(0x20)
         self.ReleaseKey(0x20)
 
 
@@ -99,17 +120,28 @@ class SoftKbMouseV2(SoftKbMouse):
     def __init__(self):
         super().__init__()
         self.press = pydirectinput.press
+        self.leftClick = pydirectinput.leftClick
+        self.rightClick = pydirectinput.rightClick
 
     def push_space(self):
         self.press('space', interval=(random.random() + 1.0) * self.PRESS_TIME)
+
+    def double_dodge(self):
+        self.rightClick(_pause=False)
+        time.sleep(self.SHORT_PRESS_TIME)
+        self.leftClick(_pause=False)
+        time.sleep(self.SHORT_PRESS_TIME)
+        self.press('space')
 
 
 class SoftKbMouseV1(SoftKbMouse):
     def __init__(self):
         super().__init__()
         self.button = win32api.keybd_event
+        self.mouse_button = win32api.mouse_event
         self.space_key = win32con.VK_SPACE
         self.relax = win32con.KEYEVENTF_KEYUP
+        self.mouse_key = win32con.VK_SPACE
 
     def push_space(self):
         self.button(self.space_key, 0, 0, 0)
@@ -175,10 +207,11 @@ class HardKbMouse:
 class DodgingTrigger(GameAudioListener):
     monitor_time = 5  # 秒
 
-    def __init__(self, sample_path: str, action, threshold=0.1, ratio=1.0, is_monitor=False):
+    def __init__(self, sample_path: str, action, threshold=0.1, ratio=1.0, is_monitor=False, is_allowed_succe_dodge=False):
         self.action = action
         self.threshold = threshold
         self.is_monitor = is_monitor
+        self.is_allowed_succe_dodge = is_allowed_succe_dodge
         if self.is_monitor:
             self.len_samples = int(self.monitor_time / self.sample_len)
             self.monitor = WaveMonitor(self.len_samples, self.threshold)
@@ -209,14 +242,14 @@ class DodgingTrigger(GameAudioListener):
                     self.monitor.update_array(self.monitor_array)
 
                 if max_score >= self.threshold:
-                    # if not is_past_triggered:  # 应该可以连续激发
-                    self.action()  # 触发动作
-                    trigger_text = "触发分数: {}".format(round(max_score, 5))
-                    self.monitor.update_message(trigger_text)
-                    print(trigger_text)
+                    if is_not_past_triggered or self.is_allowed_succe_dodge:  # 是否可以连续激发
+                        self.action()  # 触发动作
+                        trigger_text = "触发分数: {}".format(round(max_score, 5))
+                        self.monitor.update_message(trigger_text)
+                        print(trigger_text)
 
-                    is_past_triggered = True
+                        is_not_past_triggered = False
                 else:
-                    is_past_triggered = False
+                    is_not_past_triggered = True
 
                 last_frames = current_frame
