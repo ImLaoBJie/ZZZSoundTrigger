@@ -16,7 +16,9 @@ Dodging Trigger for ZZZ based on waveframe
 
 `EXPANSION_RATIO`: 最大归一化交叉相关 (MAXIMUM NORMALIZED CROSS-CORRELATE) 的倍数，默认1.0
 
-~~`COM_NAME`: 单片机端口，可以忽略~~
+`IS_ALLOW_SUCCESSIVE_TRIGGER`: 是否可以连续触发，默认不可以`False` (防止连续触发)
+
+`ACTION`: 格挡 (`'push_space'`)或者双闪 (`'double_dodge'`)，默认格挡，由于音频识别无法识别红光，因此双闪的效果并不好，即红光闪避后会切人，不建议使用
 
 ## 原理说明
 演示视频：[Bilibili](https://www.bilibili.com/video/BV1MT421r73n/)
