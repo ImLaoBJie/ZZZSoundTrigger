@@ -222,7 +222,7 @@ class DodgingTrigger(GameAudioListener):
         print("开始监测")
 
         last_frames = np.empty(shape=(0,), dtype=np.float64)
-        is_past_triggered = False
+        is_not_past_triggered = True
 
         with self.audio_instance as audio_recorder:
             while True:
