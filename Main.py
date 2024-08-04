@@ -11,7 +11,7 @@ SAMPLE_PATH = "./特征波形_完整.wav"
 THRESHOLD = 0.1  # 阈值
 EXPANSION_RATIO = 1.0  # 最大NCC系数
 IS_ALLOW_SUCCESSIVE_TRIGGER = False
-ACTION = 'double_dodge'  # 空格或双闪
+ACTION = 'push_space'  # 空格或双闪
 
 
 if __name__ == "__main__":
