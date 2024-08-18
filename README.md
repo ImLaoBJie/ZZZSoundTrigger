@@ -18,7 +18,7 @@ Dodging Trigger for ZZZ based on waveframe
 
 `IS_ALLOW_SUCCESSIVE_TRIGGER`: 是否可以连续触发，默认不可以`False` (防止连续触发)
 
-`ACTION`: 格挡 (`'push_space'`)或者双闪 (`'double_dodge'`)，默认格挡，由于音频识别无法识别红光，因此双闪的效果并不好，即红光闪避后会切人，不建议使用
+`ACTION`: 格挡 (`'push_space'`), 闪避 (`'dodge'`)或者双闪 (`'double_dodge'`)，默认格挡，由于音频识别无法识别红光，因此双闪的效果并不好，即红光闪避后会切人，不建议使用
 
 ## 原理说明
 演示视频：[Bilibili](https://www.bilibili.com/video/BV1MT421r73n/)
