@@ -22,3 +22,9 @@ Dodging Trigger for ZZZ based on waveframe
 
 ## 原理说明
 演示视频：[Bilibili](https://www.bilibili.com/video/BV1MT421r73n/)
+
+## 免责声明
+
+· 使用本项目产生的所有问题与本项目与及开发者无关。
+
+· 若您遇到商家使用本软件进行代练、演示、贩卖或收费，产生的任何问题及后果与本项目无关。
