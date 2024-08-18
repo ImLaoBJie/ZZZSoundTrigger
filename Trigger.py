@@ -105,6 +105,11 @@ class SoftKbMouseV3(SoftKbMouse):
         time.sleep((random.random() + 1.0) * self.PRESS_TIME)  # human-like
         self.ReleaseKey(0x20)
 
+    def dodge(self):
+        self.Mouse(0, 0, MOUSEEVENTF_RIGHTDOWN)
+        time.sleep((random.random() + 1.0) * self.PRESS_TIME)  # human-like
+        self.Mouse(0, 0, MOUSEEVENTF_RIGHTUP)
+
     def double_dodge(self):
         self.Mouse(0, 0, MOUSEEVENTF_RIGHTDOWN)
         self.Mouse(0, 0, MOUSEEVENTF_RIGHTUP)
@@ -125,6 +130,9 @@ class SoftKbMouseV2(SoftKbMouse):
 
     def push_space(self):
         self.press('space', interval=(random.random() + 1.0) * self.PRESS_TIME)
+
+    def dodge(self):
+        self.rightClick(interval=(random.random() + 1.0) * self.PRESS_TIME)
 
     def double_dodge(self):
         self.rightClick(_pause=False)
@@ -245,7 +253,8 @@ class DodgingTrigger(GameAudioListener):
                     if is_not_past_triggered or self.is_allowed_succe_dodge:  # 是否可以连续激发
                         self.action()  # 触发动作
                         trigger_text = "触发分数: {}".format(round(max_score, 5))
-                        self.monitor.update_message(trigger_text)
+                        if self.is_monitor:
+                            self.monitor.update_message(trigger_text)
                         print(trigger_text)
 
                         is_not_past_triggered = False

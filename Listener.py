@@ -1,13 +1,9 @@
 import numpy as np
 
 import librosa
-import wave
 import soundcard as sc
-import soundfile as sf
 
-from time import time
-
-from scipy.signal import correlate
+from scipy.signal import correlate, butter, filtfilt
 from sklearn.preprocessing import scale
 
 
@@ -18,9 +14,15 @@ class GameAudioListener:
     device_index = 0  # 设备编号
     sample_len = 0.2  # 每次采样长度0.2s
 
+    degree = 4  # 四阶bathworth多项式, 越大阻带区域滤波程度越大
+    cut_off = 1000  # Hz,截止频率,对该频率一下的声音进行滤波,若需要识别人声可适当降低
+
     def __init__(self, sample_path: str, ratio=1.0):
         self.sample_waveform, sample_rate = librosa.load(sample_path)
         self.sample_waveform = librosa.resample(self.sample_waveform, orig_sr=sample_rate, target_sr=self.used_sr)
+
+        self.b, self.a = butter(self.degree, self.cut_off, btype='highpass', output='ba', fs=self.used_sr)  # Butterworth高通滤波
+        self.sample_waveform = self._filtering(self.sample_waveform)
 
         # 初始化流监听器
         loopback_speaker = sc.get_microphone(id=str(sc.default_speaker().name), include_loopback=True)
@@ -30,7 +32,14 @@ class GameAudioListener:
 
         print("初始化完毕...")
 
+    def _filtering(self, _waveform: np.ndarray):
+        # 零相位滤波
+        _waveform = filtfilt(self.b, self.a, _waveform)
+        return _waveform
+
     def matching(self, stream_waveform: np.ndarray):
+        stream_waveform = self._filtering(stream_waveform)
+
         # 标准化
         norm_stream_waveform = scale(stream_waveform, with_mean=False)
         norm_sample_waveform = scale(self.sample_waveform, with_mean=False)

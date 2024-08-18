@@ -2,11 +2,8 @@ SoundCard==0.4.3
 numpy==1.23.5
 matplotlib==3.9.0
 future==1.0.0
-pyserial==3.5
 librosa==0.10.2.post1
 PyDirectInput==1.0.4
 pywin32==306
-Wave==0.0.2
-soundfile==0.12.1
 scipy==1.10.1
 scikit-learn==1.2.2
